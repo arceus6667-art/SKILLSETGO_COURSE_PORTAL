@@ -63,7 +63,11 @@ export function PortalShell({
     admin
       ? (new URL(href, "http://local").searchParams.get("view") ||
           "overview") === selected
-      : pathname === href;
+      : pathname === href ||
+        (href === "/dashboard/my-learning" &&
+          pathname.startsWith("/dashboard/course/")) ||
+        (href === "/dashboard/exams" &&
+          pathname.startsWith("/dashboard/exam/"));
   const title =
     navigation.find(([href]) => active(href))?.[1] || "Your workspace";
   const links = navigation.map(([href, label, Icon]) => (

@@ -53,7 +53,7 @@ const check = (s) => {
   console.log("PASS", s);
 };
 try {
-  assert.match(await (await fetch(base)).text(), /LOCAL SANDBOX/);
+  assert.match(await (await fetch(base)).text(), /LOCAL PREVIEW/);
   const a = await login("Workflow Test Learner");
   await ok({ action: "enroll", domainId: "python" });
   await ok({ action: "enroll", domainId: "python" });

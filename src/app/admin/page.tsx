@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ShieldCheck, ClipboardCheck } from "lucide-react";
 import { redirect } from "next/navigation";
 import { currentUser } from "@/lib/auth";
 import { transact, sandbox } from "@/lib/store";
@@ -88,6 +89,19 @@ export default async function Admin({
       | "audit"
   ];
   const paid = s.orders.filter((o) => o.status === "paid");
+  const published = s.domains.filter((d) => d.published);
+  const withResources = published.filter((d) => d.resources.length > 0).length;
+  const readyBanks = published.filter((d) => {
+    const questions = s.questions.filter(
+      (q) => q.domainId === d.id && q.approved,
+    );
+    return (
+      questions.filter((q) => q.difficulty === "easy").length >= 9 &&
+      questions.filter((q) => q.difficulty === "medium").length >= 15 &&
+      questions.filter((q) => q.difficulty === "hard").length >= 6
+    );
+  }).length;
+  const submitted = s.attempts.filter((a) => a.status === "submitted");
   return (
     <PortalShell user={u} sandbox={sandbox}>
       <div className="page-heading">
@@ -134,6 +148,95 @@ export default async function Admin({
               <strong>{s.credentials.filter((c) => !c.revoked).length}</strong>
               <span>Issued documents</span>
             </div>
+          </div>
+          <div className="admin-health">
+            <section className="panel">
+              <div className="health-heading">
+                <ShieldCheck size={28} />
+                <div>
+                  <h2>Launch readiness</h2>
+                  <p>Keep the learning experience ready for users.</p>
+                </div>
+              </div>
+              <div className="readiness-row">
+                <div>
+                  <strong>Published learning paths</strong>
+                  <small>
+                    {published.length} domains visible in the catalogue
+                  </small>
+                </div>
+                <Link href="/admin?view=content">Manage</Link>
+              </div>
+              <div className="readiness-row">
+                <div>
+                  <strong>
+                    {withResources}/{published.length} with learning materials
+                  </strong>
+                  <small>Videos, reading, or PDFs published</small>
+                </div>
+                <Link href="/admin?view=content">Add content</Link>
+              </div>
+              <div className="readiness-row">
+                <div>
+                  <strong>
+                    {readyBanks}/{published.length} assessment banks ready
+                  </strong>
+                  <small>
+                    9 easy, 15 medium, and 6 hard approved questions
+                  </small>
+                </div>
+                <Link href="/admin?view=questions">Review banks</Link>
+              </div>
+            </section>
+            <section className="panel">
+              <div className="health-heading">
+                <ClipboardCheck size={28} />
+                <div>
+                  <h2>Needs your attention</h2>
+                  <p>Make the next action easy to find.</p>
+                </div>
+              </div>
+              <div className="readiness-row">
+                <div>
+                  <strong>
+                    {s.tickets.filter((t) => t.status === "open").length} open
+                    support requests
+                  </strong>
+                  <small>Questions and accommodation needs</small>
+                </div>
+                <Link href="/admin?view=support">Review</Link>
+              </div>
+              <div className="readiness-row">
+                <div>
+                  <strong>
+                    {s.orders.filter((o) => o.status === "review").length}{" "}
+                    payments to review
+                  </strong>
+                  <small>Reconcile before document issuance</small>
+                </div>
+                <Link href="/admin?view=finance">View</Link>
+              </div>
+              <div className="readiness-row">
+                <div>
+                  <strong>
+                    {submitted.length
+                      ? Math.round(
+                          (submitted.filter((a) => (a.score || 0) >= 23)
+                            .length /
+                            submitted.length) *
+                            100,
+                        ) + "%"
+                      : "No results yet"}
+                  </strong>
+                  <small>
+                    {submitted.length
+                      ? "Pass rate across completed attempts"
+                      : "Assessment outcomes will appear here"}
+                  </small>
+                </div>
+                <Link href="/admin?view=students">Users</Link>
+              </div>
+            </section>
           </div>
           <div className="panel">
             <h2>Learning across domains</h2>

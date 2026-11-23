@@ -46,15 +46,29 @@ export function Course({
   }
   return (
     <>
-      <span className="eyebrow gold">{d.category}</span>
-      <h1>{d.name}</h1>
-      <p className="lead">{d.description}</p>
+      <div className="course-intro">
+        <span className="eyebrow gold">{d.category}</span>
+        <h1>{d.name}</h1>
+        <p className="lead">{d.description}</p>
+        <div className="course-meta">
+          <span>{d.resources.length} published resources</span>
+          <span>30-question assessment</span>
+          <span>{d.duration} minute exam</span>
+          <span>Free performance report</span>
+        </div>
+      </div>
       {!enrollment ? (
         <section className="panel">
-          <h2>Your next chapter starts here.</h2>
+          <span className="eyebrow gold">YOUR LEARNING PATH</span>
+          <h2>Build a foundation. Make your next move.</h2>
           <p>
             Enroll to access published materials and your assessment pathway.
           </p>
+          <ul className="course-outcomes">
+            {d.outcomes.map((outcome) => (
+              <li key={outcome}>{outcome}</li>
+            ))}
+          </ul>
           <ActionButton body={{ action: "enroll", domainId: d.id }}>
             Enroll in this domain
           </ActionButton>

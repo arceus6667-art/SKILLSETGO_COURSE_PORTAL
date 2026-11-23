@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import "./workspace-v2.css";
 import "./login-v2.css";
+import "./academy.css";
 export const metadata: Metadata = {
   title: {
     default: "Skill Set Go EduTech · Learn. Build. Prove.",

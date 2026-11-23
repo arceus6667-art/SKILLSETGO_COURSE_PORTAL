@@ -42,7 +42,7 @@ export default async function Page({
   searchParams,
 }: {
   params: Promise<{ section: string }>;
-  searchParams: Promise<{ domain?: string; q?: string }>;
+  searchParams: Promise<{ domain?: string; q?: string; goal?: string }>;
 }) {
   const { section } = await params;
   if (!headings[section]) notFound();
@@ -83,7 +83,11 @@ export default async function Page({
         </div>
       </div>
       {section === "domains" ? (
-        <DomainExplorer domains={data.domains} initial={query.q || ""} />
+        <DomainExplorer
+          domains={data.domains}
+          initial={query.q || ""}
+          initialGoal={query.goal}
+        />
       ) : null}
       {section === "my-learning" ? (
         enrolled.length ? (

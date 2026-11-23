@@ -1,5 +1,15 @@
 # Verification record
 
+## Academy UI refresh — 24 November 2026
+
+Reviewed LearnTube's public homepage and linked certification category/skill selection. Adapted discovery and journey ideas into original Skill Set Go pages; see DESIGN-RESEARCH.md for scope and limits.
+
+Implemented a new homepage, five goal filters, domain covers, public domain details, next-action learning dashboard, course overview, shared mobile/desktop styling, and admin content/question readiness and attention queues. User/Admin remain the only roles.
+
+Verified homepage at 1440px and 390px, goal link filtering to three AI/data domains, no-match search and reset to twelve domains, learner dashboard, course continuation and mobile course layout. No horizontal overflow was observed on the checked 390px pages. Fixed dark-header and mobile-menu contrast during browser review. The admin overview's readiness and attention sections rendered successfully using an existing local admin fixture through HTTP. Ten tests, twenty-three workflow checks, and the production build passed. The workflow's local-mode guard was updated for the revised preview notice.
+
+This refresh does not enable missing private server credentials, Google OAuth credentials, or live payments. It is a local preview, not a Sites publication.
+
 ## Update — 24 November 2026
 
 The AgentTrap AI project's SKILLSETGOCOURCES database (`smdgqmmnqbhqqhkyqxok`) now has the relational migrations and twelve-domain catalogue applied. Seventeen application tables have RLS enabled. Public REST returned twelve published domains, the publishable key was rejected by the privileged repository RPC, email Auth was enabled, and Google Auth was disabled.

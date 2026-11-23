@@ -6,6 +6,8 @@ import {
   Flame,
   Code2,
   Clock3,
+  CheckCircle2,
+  Circle,
 } from "lucide-react";
 import { requirePageUser as requireUser } from "@/lib/auth";
 import { transact, sandbox } from "@/lib/store";
@@ -24,18 +26,81 @@ export default async function Dashboard() {
       domains: s.domains.filter((d) => d.published),
     };
   });
+  const passed = new Set(
+    data.attempts.filter((a) => (a.score || 0) >= 23).map((a) => a.domainId),
+  );
+  const active = data.attempts.find((a) => a.status === "active");
+  const nextEnrollment =
+    data.enrollments.find((e) => !passed.has(e.domainId)) ||
+    data.enrollments[0];
+  const nextDomain = data.domains.find(
+    (d) => d.id === nextEnrollment?.domainId,
+  );
+  const nextHref = active
+    ? `/dashboard/exam/${active.id}`
+    : nextDomain
+      ? `/dashboard/course/${nextDomain.slug}`
+      : "/dashboard/domains";
   return (
     <>
       <div className="page-heading">
         <div>
-          <span className="eyebrow gold">YOUR NEXT CHAPTER</span>
+          <span className="eyebrow gold">YOUR LEARNING SPACE</span>
           <h1>Welcome back, {user.name.split(" ")[0]}.</h1>
-          <p>A little curiosity. A new skill. A step closer to your goals.</p>
+          <p>Your next skill is a little closer. Let’s keep moving.</p>
         </div>
         <Link className="btn btn-outline" href="/dashboard/domains">
           Explore domains
         </Link>
       </div>
+      <section className="dashboard-hero">
+        <div>
+          <span className="eyebrow">
+            {active
+              ? "ASSESSMENT IN PROGRESS"
+              : nextDomain
+                ? "PICK UP WHERE YOU LEFT OFF"
+                : "A SMALL START. A BIG POSSIBILITY."}
+          </span>
+          <h2>
+            {active
+              ? "Your assessment is waiting."
+              : nextDomain
+                ? nextDomain.name
+                : "What will you learn next?"}
+          </h2>
+          <p>
+            {active
+              ? "Your server timer keeps running. Resume now to use the time remaining."
+              : nextDomain
+                ? "Your learning materials, progress, and next assessment are in one place."
+                : "Discover a direction that fits your ambition. Start with a domain, then build at your own pace."}
+          </p>
+          <Link className="btn" href={nextHref}>
+            {active
+              ? "Resume assessment"
+              : nextDomain
+                ? "Continue learning"
+                : "Find my learning path"}
+          </Link>
+          <Link className="dashboard-secondary" href="/dashboard/exams">
+            Already skilled? Explore assessments
+          </Link>
+        </div>
+        <div className="dashboard-milestones">
+          {[
+            [data.enrollments.length > 0, "Choose your learning path"],
+            [passed.size > 0, "Pass your assessment"],
+            [data.credentials.length > 0, "Unlock your achievement"],
+          ].map(([done, label]) => (
+            <span className={done ? "done" : ""} key={String(label)}>
+              {done ? <CheckCircle2 /> : <Circle />}
+              {label}
+            </span>
+          ))}
+          <small>Learn freely. Documents are optional.</small>
+        </div>
+      </section>
       <div className="stats-grid">
         {[
           [BookOpen, data.enrollments.length, "Learning paths"],
@@ -45,11 +110,7 @@ export default async function Dashboard() {
             "Assessments completed",
           ],
           [Award, data.credentials.length, "Credentials earned"],
-          [
-            Flame,
-            data.attempts.filter((a) => (a.score || 0) >= 23).length,
-            "Domains passed",
-          ],
+          [Flame, passed.size, "Domains passed"],
         ].map(([Icon, n, label]) => {
           const I = Icon as typeof BookOpen;
           return (
@@ -61,37 +122,15 @@ export default async function Dashboard() {
           );
         })}
       </div>
-      <section className="continue-banner">
-        <div>
-          <span className="pill">YOUR LEARNING JOURNEY</span>
-          <h2>
-            {data.enrollments.length
-              ? "Pick up your next milestone."
-              : "Make room for what comes next."}
-          </h2>
-          <p>
-            {data.enrollments.length
-              ? "Pick up where you left off. Your resources and progress are right here."
-              : "Find a domain that sparks your curiosity. Your learning journey starts with a choice."}
-          </p>
-          <Link
-            className="btn btn-gold"
-            href={
-              data.enrollments.length
-                ? "/dashboard/my-learning"
-                : "/dashboard/domains"
-            }
-          >
-            {data.enrollments.length
-              ? "Continue learning"
-              : "Choose your first domain"}
-          </Link>
-        </div>
-        <div className="banner-symbol">
-          <GraduationMark />
-        </div>
-      </section>
-      <div className="two-grid">
+      <nav className="dashboard-tabs" aria-label="Learning shortcuts">
+        <Link className="selected" href="/dashboard" aria-current="page">
+          Your overview
+        </Link>
+        <Link href="/dashboard/my-learning">My learning</Link>
+        <Link href="/dashboard/exams">Assessments</Link>
+        <Link href="/dashboard/documents">Achievements</Link>
+      </nav>
+      <div className="learning-overview">
         <section className="panel">
           <div className="panel-heading">
             <h2>My learning paths</h2>
@@ -135,10 +174,13 @@ export default async function Dashboard() {
               <p>
                 Enroll in your first domain to see your learning journey here.
               </p>
+              <Link href="/dashboard/domains" className="btn btn-outline">
+                Discover a learning path
+              </Link>
             </div>
           )}
         </section>
-        <section className="panel">
+        <section className="panel next-step-card">
           <span className="eyebrow gold">KNOW BEFORE YOU GO</span>
           <h2>Your assessment, explained.</h2>
           <div className="rule-row">
@@ -167,13 +209,5 @@ export default async function Dashboard() {
         <DomainGrid domains={data.domains.slice(0, 3)} portal />
       </section>
     </>
-  );
-}
-function GraduationMark() {
-  return (
-    <div>
-      <Award size={100} strokeWidth={1} />
-      <span>LEARN. BUILD. PROVE.</span>
-    </div>
   );
 }
