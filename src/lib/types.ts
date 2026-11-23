@@ -1,0 +1,120 @@
+export type Role = "user" | "admin";
+export type User = {
+  id: string;
+  name: string;
+  email: string;
+  role: Role;
+  country?: string;
+  college?: string;
+};
+export type Resource = {
+  id: string;
+  title: string;
+  kind: "video" | "pdf" | "reading";
+  url: string;
+  storagePath?: string;
+};
+export type Domain = {
+  id: string;
+  slug: string;
+  name: string;
+  short: string;
+  description: string;
+  category: string;
+  published: boolean;
+  resources: Resource[];
+  outcomes: string[];
+  duration: number;
+};
+export type Question = {
+  id: string;
+  domainId: string;
+  topic: string;
+  prompt: string;
+  options: string[];
+  correct: number;
+  explanation: string;
+  difficulty: "easy" | "medium" | "hard";
+  approved: boolean;
+};
+export type Enrollment = {
+  id: string;
+  userId: string;
+  domainId: string;
+  completed: string[];
+  method?: string;
+  acknowledgedAt?: string;
+  policyVersion?: string;
+};
+export type Attempt = {
+  id: string;
+  userId: string;
+  domainId: string;
+  startedAt: string;
+  endsAt: string;
+  status: "active" | "submitted";
+  questions: Question[];
+  answers: Record<string, number>;
+  violations: { id: string; at: string; reason: string }[];
+  monitoring: "standard" | "accommodated";
+  consent: { version: string; at: string; direct: boolean };
+  score?: number;
+  reason?: string;
+  submittedAt?: string;
+};
+export type Order = {
+  id: string;
+  userId: string;
+  domainId: string;
+  product: "certificate" | "letter" | "bundle";
+  amount: number;
+  currency: "INR";
+  status: "created" | "paid" | "review";
+  providerOrderId?: string;
+  paymentId?: string;
+  createdAt: string;
+  expiresAt: string;
+  paidAt?: string;
+  mode: "sandbox" | "live";
+};
+export type Credential = {
+  id: string;
+  userId: string;
+  domainId: string;
+  domainName: string;
+  signaturePath?: string;
+  kind: "certificate" | "letter";
+  issuedAt: string;
+  name: string;
+  score: number;
+  revoked: boolean;
+  mode: "sandbox" | "live";
+};
+export type Audit = {
+  id: string;
+  actor: string;
+  action: string;
+  target: string;
+  at: string;
+  detail?: string;
+};
+export type Ticket = {
+  id: string;
+  userId: string;
+  message: string;
+  status: "open" | "resolved";
+  at: string;
+};
+export type State = {
+  users: User[];
+  domains: Domain[];
+  questions: Question[];
+  enrollments: Enrollment[];
+  attempts: Attempt[];
+  orders: Order[];
+  credentials: Credential[];
+  audit: Audit[];
+  tickets: Ticket[];
+  webhooks: string[];
+  settings: { logoPath?: string; signaturePath?: string };
+};
